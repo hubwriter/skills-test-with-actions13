@@ -20,7 +20,9 @@ jobs:
   # Get the current step to only run the main job when the learner is on the same step.
   get_current_step:
     name: Check current step number
-    if: ${{ github.event.issue.pull_request }}
+    if: | 
+      ${{ github.event.issue.pull_request }} &&        # only for pull requests, not issues
+      contains(github.event.comment.body, 'fail')      # check the comment contains the keyword
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,13 +55,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Let's get all the branches.
-
-      # Verify the learner added remark-lint.
-      - name: Verify workflow
-        uses: skills/action-check-file@v1
-        with:
-          file: .github/workflows/ci.yml
-          search: remark-preset-lint-consistent
 
       # In README.md, switch step 1 for step 2.
       - name: Update to step 2
